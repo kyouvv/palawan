@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Palawan — The Last Frontier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&family=DM+Serif+Display&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- ── NAV ── -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">PALAWAN</a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="destinations.html">Destinations</a></li>
+        <li><a href="experiences.html">Experiences</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="nav-auth">
+        <a href="login.html" class="btn-login" id="navLoginBtn">Log In</a>
+        <a href="login.html#signup" class="btn-signup">Sign Up</a>
+        <div class="user-menu hidden" id="userMenu">
+          <span class="user-greeting" id="userGreeting">Hi, Traveler</span>
+          <button class="btn-logout" id="logoutBtn">Log Out</button>
+        </div>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
+    </div>
+    <div class="mobile-menu hidden" id="mobileMenu">
+      <a href="index.html">Home</a>
+      <a href="destinations.html">Destinations</a>
+      <a href="experiences.html">Experiences</a>
+      <a href="contact.html">Contact</a>
+      <a href="login.html" id="mobileLoginBtn">Log In</a>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">IT'S TIME TO VISIT</p>
+      <h1 class="hero-title">PALAWAN</h1>
+      <p class="hero-sub">The Last Frontier of the Philippines</p>
+      <div class="hero-cta">
+        <a href="destinations.html" class="btn-primary">Explore Destinations</a>
+        <a href="experiences.html" class="btn-ghost">View Experiences</a>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ── INTRO ── -->
+  <section class="intro section">
+    <div class="container intro-grid">
+      <div class="intro-text">
+        <h2>Discover the<br /><em>Last Frontier</em></h2>
+        <p>Palawan is an archipelagic province of the Philippines, renowned for its stunning limestone cliffs,
+          crystal-clear lagoons, and extraordinary marine biodiversity. Named the world's best island multiple times, it
+          promises an unforgettable escape.</p>
+        <p>From the underground river of Puerto Princesa to the secret lagoons of El Nido and the wrecks of Coron —
+          every corner tells a story.</p>
+        <a href="destinations.html" class="btn-primary">Plan Your Trip →</a>
+      </div>
+      <div class="intro-map">
+        <div class="map-svg-wrap">
+          <!-- Stylized Palawan island shape -->
+          <svg viewBox="0 0 240 520" xmlns="http://www.w3.org/2000/svg" class="palawan-map">
+            <defs>
+              <linearGradient id="islandGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#2d7a4f" />
+                <stop offset="100%" stop-color="#52b788" />
+              </linearGradient>
+            </defs>
+            <!-- Island body -->
+            <path
+              d="M140,10 C160,20 175,45 180,75 C185,105 178,130 170,155 C162,180 155,200 160,230 C165,260 175,285 170,315 C165,345 150,370 135,395 C120,420 105,445 100,470 C95,495 100,510 95,515 C88,512 80,495 75,470 C70,445 72,420 65,395 C58,370 45,348 38,318 C31,288 35,260 42,232 C49,204 55,178 50,150 C45,122 38,96 45,68 C52,40 70,18 90,10 C110,2 125,5 140,10 Z"
+              fill="url(#islandGrad)" stroke="#1a5e38" stroke-width="1.5" />
+            <!-- Location dots -->
+            <circle cx="120" cy="80" r="7" fill="#f4a261" stroke="white" stroke-width="2" />
+            <text x="132" y="84" font-family="Inter" font-size="10" fill="#1a5e38" font-weight="600">El Nido</text>
+            <circle cx="105" cy="250" r="7" fill="#e76f51" stroke="white" stroke-width="2" />
+            <text x="118" y="254" font-family="Inter" font-size="10" fill="#1a5e38" font-weight="600">Puerto
+              Princesa</text>
+            <circle cx="90" cy="160" r="6" fill="#f4a261" stroke="white" stroke-width="2" />
+            <text x="103" y="164" font-family="Inter" font-size="10" fill="#1a5e38" font-weight="600">Port Barton</text>
+            <circle cx="100" cy="390" r="6" fill="#e76f51" stroke="white" stroke-width="2" />
+            <text x="113" y="394" font-family="Inter" font-size="10" fill="#1a5e38" font-weight="600">Coron</text>
+            <!-- Decorative sea elements -->
+            <text x="15" y="120" font-size="20" opacity="0.4">🐬</text>
+            <text x="185" y="200" font-size="18" opacity="0.4">🚣</text>
+            <text x="10" y="320" font-size="16" opacity="0.4">🤿</text>
+          </svg>
+        </div>
+        <div class="map-stats">
+          <div class="stat"><span class="stat-num">1,780</span><span class="stat-lbl">Islands</span></div>
+          <div class="stat"><span class="stat-num">2,400+</span><span class="stat-lbl">Species</span></div>
+          <div class="stat"><span class="stat-num">#1</span><span class="stat-lbl">Best Island</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MOST POPULAR DESTINATIONS ── -->
+  <section class="popular section">
+    <div class="container">
+      <div class="section-head">
+        <h2>Most Popular Destinations</h2>
+        <a href="destinations.html" class="see-all">See all →</a>
+      </div>
+      <div class="destinations-slider" id="destSlider">
+        <div class="dest-card">
+          <div class="dest-img"
+            style="background:linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.55)), url('El Nido.jpg') center/cover">
+          </div>
+          <div class="dest-info">
+            <h3>El Nido</h3>
+            <p>Towering limestone karsts & hidden lagoons</p>
+            <span class="dest-tag nature">Nature</span>
+            <a href="destinations.html#elnido" class="dest-explore">Explore →</a>
+          </div>
+        </div>
+        <div class="dest-card">
+          <div class="dest-img"
+            style="background:linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.55)), url('Puerto Princesa.jpg') center/cover">
+          </div>
+          <div class="dest-info">
+            <h3>Puerto Princesa</h3>
+            <p>UNESCO World Heritage Underground River</p>
+            <span class="dest-tag adventure">Adventure</span>
+            <a href="destinations.html#puerto" class="dest-explore">Explore →</a>
+          </div>
+        </div>
+        <div class="dest-card">
+          <div class="dest-img"
+            style="background:linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.55)), url('Port Barton.jpg') center/cover">
+          </div>
+          <div class="dest-info">
+            <h3>Port Barton</h3>
+            <p>Secluded paradise with powdery white sands</p>
+            <span class="dest-tag beach">Beach</span>
+            <a href="destinations.html#portbarton" class="dest-explore">Explore →</a>
+          </div>
+        </div>
+        <div class="dest-card">
+          <div class="dest-img"
+            style="background:linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.55)), url('Coron.jpeg') center/cover">
+          </div>
+          <div class="dest-info">
+            <h3>Coron</h3>
+            <p>Legendary WWII wreck diving & twin lagoons</p>
+            <span class="dest-tag adventure">Adventure</span>
+            <a href="destinations.html#coron" class="dest-explore">Explore →</a>
+          </div>
+        </div>
+        <div class="dest-card">
+          <div class="dest-img"
+            style="background:linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.55)), url('San Vicente.jpg') center/cover">
+          </div>
+          <div class="dest-info">
+            <h3>San Vicente</h3>
+            <p>Home to the Philippines' longest white beach</p>
+            <span class="dest-tag beach">Beach</span>
+            <a href="destinations.html#sanvicente" class="dest-explore">Explore →</a>
+          </div>
+        </div>
+      </div>
+      <div class="slider-dots" id="sliderDots"></div>
+    </div>
+  </section>
+
+  <!-- ── CTA BANNER ── -->
+  <section class="cta-banner">
+    <div class="cta-overlay"></div>
+    <div class="cta-content">
+      <h2>TRAVEL AND<br />ENJOY YOUR<br />HOLIDAY</h2>
+      <div class="cta-right">
+        <p>Ready to experience paradise?</p>
+        <a href="contact.html" class="btn-primary">Contact Us</a>
+        <a href="login.html#signup" class="btn-ghost">Book Now</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo">PALAWAN</div>
+        <p>The Last Frontier of the Philippines. Where nature remains untouched and every moment is a memory.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Navigate</h4>
+        <a href="index.html">Home</a>
+        <a href="destinations.html">Destinations</a>
+        <a href="experiences.html">Experiences</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div class="footer-links">
+        <h4>Destinations</h4>
+        <a href="destinations.html#elnido">El Nido</a>
+        <a href="destinations.html#puerto">Puerto Princesa</a>
+        <a href="destinations.html#coron">Coron</a>
+        <a href="destinations.html#portbarton">Port Barton</a>
+      </div>
+      <div class="footer-contact">
+        <h4>Get In Touch</h4>
+        <p>📍 Puerto Princesa City, Palawan</p>
+        <p>📞 +63 48 433 2983</p>
+        <p>✉️ hello@visitpalawan.ph</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Visit Palawan. All rights reserved. | Developed for PUP CCIS Web Development</p>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+
+</html>
