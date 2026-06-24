@@ -8,46 +8,33 @@
 </head>
 <body>
 
-<nav class="navbar scrolled" id="navbar">
-
-<div class="nav-inner">
-
-<a href="index.html" class="nav-logo">
-PALAWAN
-</a>
-
-<ul class="nav-links">
-<li><a href="index.html">Home</a></li>
-<li><a href="destinations.html">Destinations</a></li>
-<li><a href="experiences.html">Experiences</a></li>
-<li><a href="contact.html">Contact</a></li>
-</ul>
-
-<div class="nav-auth">
-<a href="login.html" class="btn-login">
-Log In
-</a>
-
-<a href="login.html#signup" class="btn-signup">
-Sign Up
-</a>
-</div>
-
-<button class="hamburger" id="hamburger">
-☰
-</button>
-
-</div>
-
-<div class="mobile-menu hidden" id="mobileMenu">
-<a href="index.html">Home</a>
-<a href="destinations.html">Destinations</a>
-<a href="experiences.html">Experiences</a>
-<a href="contact.html">Contact</a>
-<a href="login.html">Log In</a>
-</div>
-
-</nav>
+<nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">PALAWAN</a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="destinations.html">Destinations</a></li>
+        <li><a href="experiences.html" class="active">Experiences</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="nav-auth">
+        <a href="login.html" class="btn-login" id="navLoginBtn">Log In</a>
+        <a href="login.html#signup" class="btn-signup">Sign Up</a>
+        <div class="user-menu hidden" id="userMenu">
+          <span class="user-greeting" id="userGreeting">Hi, Traveler</span>
+          <button class="btn-logout" id="logoutBtn">Log Out</button>
+        </div>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
+    </div>
+    <div class="mobile-menu hidden" id="mobileMenu">
+      <a href="index.html">Home</a>
+      <a href="destinations.html">Destinations</a>
+      <a href="experiences.html">Experiences</a>
+      <a href="contact.html">Contact</a>
+      <a href="login.html" id="mobileLoginBtn">Log In</a>
+    </div>
+  </nav>
 
 <section class="page-hero">
 <div class="page-hero-overlay"></div>
