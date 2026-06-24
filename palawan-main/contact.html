@@ -41,22 +41,27 @@
 <form id="contactForm">
 
 <div class="form-group">
-<label>Name</label>
-<input type="text" required>
-<div class="form-error">Required field</div>
+<label for="inquiryDestination">Target Destination</label>
+      <select id="inquiryDestination" required style="width: 100%; padding: 12px; border: 1px solid var(--light-grey); border-radius: 6px; font-family: inherit; background-color: var(--white); color: var(--dark);">
+        <option value="">-- Select Target Destination --</option>
+        <option value="El Nido">El Nido</option>
+        <option value="Coron">Coron</option>
+        <option value="Puerto Princesa">Puerto Princesa</option>
+        <option value="Balabac">Balabac</option>
+      </select>
 </div>
 
 <div class="form-group">
-<label>Email</label>
-<input type="email" required>
-<div class="form-error">Required field</div>
-</div>
+      <label for="inquirySubject">Subject</label>
+      <input type="text" id="inquirySubject" placeholder="e.g., Booking Inquiry Summer 2026" required>
+      <div class="form-error" style="display: none;">Required field</div>
+    </div>
 
 <div class="form-group">
-<label>Message</label>
-<textarea required></textarea>
-<div class="form-error">Required field</div>
-</div>
+      <label for="inquiryMessage">Message Content</label>
+      <textarea id="inquiryMessage" placeholder="Type your detailed message here..." required></textarea>
+      <div class="form-error" style="display: none;">Required field</div>
+    </div>
 
 <button class="btn-primary form-submit">
 Send Message

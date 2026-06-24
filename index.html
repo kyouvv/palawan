@@ -14,22 +14,27 @@
 <nav class="navbar" id="navbar">
   <div class="nav-inner">
     <a href="index.html" class="nav-logo">PALAWAN</a>
+    
     <ul class="nav-links">
-      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="index.html">Home</a></li>
       <li><a href="destinations.html">Destinations</a></li>
       <li><a href="experiences.html">Experiences</a></li>
-      <li><a href="contact.html">Contact</a></li>
+      <li><a href="contact.html" class="hidden">Contact</a></li>
     </ul>
+    
     <div class="nav-auth">
       <a href="login.html" class="btn-login" id="navLoginBtn">Log In</a>
       <a href="login.html#signup" class="btn-signup">Sign Up</a>
-      <div class="user-menu hidden" id="userMenu">
-        <span class="user-greeting" id="userGreeting">Hi, Traveler</span>
-        <button class="btn-logout" id="logoutBtn">Log Out</button>
+      
+      <div class="user-menu hidden" id="userMenu" style="display: inline-flex; align-items: center; gap: 15px;">
+        <span class="user-greeting" id="userGreeting" style="font-weight: 500; color: var(--dark);"></span>
+        <button class="btn-logout" id="logoutBtn" style="background: transparent; border: 1px solid var(--grey); padding: 6px 14px; border-radius: 6px; font-size: 14px; cursor: pointer; color: var(--dark);">Log Out</button>
       </div>
     </div>
+    
     <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
   </div>
+  
   <div class="mobile-menu hidden" id="mobileMenu">
     <a href="index.html">Home</a>
     <a href="destinations.html">Destinations</a>

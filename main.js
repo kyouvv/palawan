@@ -1,74 +1,290 @@
-/* ═══════════════════════════
-   PALAWAN TOURISM — main.js
-═══════════════════════════ */
+/* ══════════════════════════════════════════
+   PALAWAN TOURISM — AJAX Core Application Engine
+══════════════════════════════════════════ */
 
-// ── Auth State ──────────────────────────────
-const AUTH_KEY = 'palawan_user';
+// Global session cache populated by the server response
+let globalUserSession = null;
 
-function getUser() {
-  try { return JSON.parse(localStorage.getItem(AUTH_KEY)); } catch { return null; }
+// ── Sync Auth State via AJAX ────────────────
+async function syncAuthState() {
+  try {
+    const response = await fetch('auth_status.php');
+    const data = await response.json();
+    
+    if (data.authenticated) {
+      globalUserSession = data.user; // Contains: id, username, email
+    } else {
+      globalUserSession = null;
+    }
+  } catch (error) {
+    console.error('Session verification exception:', error);
+    globalUserSession = null;
+  }
+  updateNavUI();
 }
-function saveUser(u) { localStorage.setItem(AUTH_KEY, JSON.stringify(u)); }
-function logout() { localStorage.removeItem(AUTH_KEY); location.reload(); }
 
-function updateNavAuth() {
-  const user = getUser();
-  const loginBtn   = document.getElementById('navLoginBtn');
-  const signupBtn  = document.querySelector('.btn-signup');
-  const userMenu   = document.getElementById('userMenu');
-  const greeting   = document.getElementById('userGreeting');
+// ── Dynamic Custom UI States ────────────────
+function updateNavUI() {
+  const loginBtn = document.getElementById('navLoginBtn');
+  const signupBtn = document.querySelector('.btn-signup');
+  const userMenu = document.getElementById('userMenu');
+  const greeting = document.getElementById('userGreeting');
   const mobileLogin = document.getElementById('mobileLoginBtn');
+  const contactLinks = document.querySelectorAll('a[href="contact.html"]');
 
-  if (user) {
-    if (loginBtn)  loginBtn.classList.add('hidden');
+  if (globalUserSession) {
+    if (loginBtn) loginBtn.classList.add('hidden');
     if (signupBtn) signupBtn.classList.add('hidden');
-    if (userMenu)  { userMenu.classList.remove('hidden'); }
-    if (greeting)  greeting.textContent = `Hi, ${user.name.split(' ')[0]}!`;
+    if (userMenu) userMenu.classList.remove('hidden');
+    if (greeting) {
+      // Show first name
+      const firstName = globalUserSession.username.split(' ')[0];
+      greeting.textContent = `Hi, ${firstName}!`;
+    }
     if (mobileLogin) mobileLogin.textContent = 'My Account';
+    
+    // Grant access to contact page links
+    contactLinks.forEach(link => link.classList.remove('hidden'));
+  } else {
+    if (loginBtn) loginBtn.classList.remove('hidden');
+    if (signupBtn) signupBtn.classList.remove('hidden');
+    if (userMenu) userMenu.classList.add('hidden');
+    if (mobileLogin) mobileLogin.textContent = 'Log In';
+    
+    // Hide contact link in main desktop nav if logged out
+    contactLinks.forEach(link => {
+      if (!link.closest('.mobile-menu')) {
+        link.classList.add('hidden');
+      }
+    });
   }
 }
 
-// ── Navbar Scroll ────────────────────────────
+// ── Navigation Bar Interactivity ────────────
 function initNavbar() {
   const nav = document.getElementById('navbar');
   if (!nav) return;
+  
   const onScroll = () => {
     nav.classList.toggle('scrolled', window.scrollY > 40);
   };
   window.addEventListener('scroll', onScroll);
   onScroll();
 
-  // Hamburger
   const ham = document.getElementById('hamburger');
   const mob = document.getElementById('mobileMenu');
   if (ham && mob) {
     ham.addEventListener('click', () => mob.classList.toggle('hidden'));
   }
 
-  // Logout button
+  // Bind logout listener
   const logoutBtn = document.getElementById('logoutBtn');
-  if (logoutBtn) logoutBtn.addEventListener('click', logout);
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const fd = new FormData();
+      fd.append('action', 'logout');
+      
+      try {
+        const response = await fetch('auth_handler.php', { method: 'POST', body: fd });
+        const data = await response.json();
+        if (data.status === 'success') {
+          showToast('Logged out successfully!', 'success');
+          setTimeout(() => { location.href = 'index.html'; }, 1000);
+        }
+      } catch (err) {
+        showToast('Logout connection dropped.', 'error');
+      }
+    });
+  }
 }
 
-// ── Slider ───────────────────────────────────
+// ── Authentication Handlers ─────────────────
+function initAuthFormProcessing() {
+  // Tabs toggle logic
+  const tabs = document.querySelectorAll('.auth-tab');
+  const panels = document.querySelectorAll('.auth-form-panel');
+  if (tabs.length) {
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        panels.forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        const target = document.getElementById(tab.dataset.target);
+        if (target) target.classList.add('active');
+      });
+    });
+    // Deep linking check for #signup
+    if (location.hash === '#signup') {
+      const signupTab = document.querySelector('[data-target="signupPanel"]');
+      if (signupTab) signupTab.click();
+    }
+  }
+
+  // Process Login
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPass').value;
+      const alertBox = document.getElementById('loginAlert');
+
+      const fd = new FormData();
+      fd.append('action', 'login');
+      fd.append('email', email);
+      fd.append('password', password);
+
+      try {
+        const response = await fetch('auth_handler.php', { method: 'POST', body: fd });
+        const data = await response.json();
+
+        if (data.status === 'success') {
+          alertBox.className = 'auth-alert success';
+          alertBox.textContent = data.message || 'Login verification successful!';
+          alertBox.style.display = 'block';
+          setTimeout(() => { location.href = 'index.html'; }, 1200);
+        } else {
+          alertBox.className = 'auth-alert error';
+          alertBox.textContent = data.message || 'Invalid username or password.';
+          alertBox.style.display = 'block';
+        }
+      } catch (err) {
+        alertBox.className = 'auth-alert error';
+        alertBox.textContent = 'Server communications issue. Please retry.';
+        alertBox.style.display = 'block';
+      }
+    });
+  }
+
+  // Process Registration
+  const signupForm = document.getElementById('signupForm');
+  if (signupForm) {
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('signupName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const password = document.getElementById('signupPass').value;
+      const confirm = document.getElementById('signupConfirm').value;
+      const alertBox = document.getElementById('signupAlert');
+
+      if (password !== confirm) {
+        alertBox.className = 'auth-alert error';
+        alertBox.textContent = 'Passwords do not match.';
+        alertBox.style.display = 'block';
+        return;
+      }
+
+      const fd = new FormData();
+      fd.append('action', 'register');
+      fd.append('name', name);
+      fd.append('email', email);
+      fd.append('password', password);
+
+      try {
+        const response = await fetch('auth_handler.php', { method: 'POST', body: fd });
+        const data = await response.json();
+
+        if (data.status === 'success') {
+          alertBox.className = 'auth-alert success';
+          alertBox.textContent = data.message || 'Profile configured successfully!';
+          alertBox.style.display = 'block';
+          setTimeout(() => { location.href = 'index.html'; }, 1200);
+        } else {
+          alertBox.className = 'auth-alert error';
+          alertBox.textContent = data.message || 'Registration rejected.';
+          alertBox.style.display = 'block';
+        }
+      } catch (err) {
+        alertBox.className = 'auth-alert error';
+        alertBox.textContent = 'Server processing failure.';
+        alertBox.style.display = 'block';
+      }
+    });
+  }
+}
+
+// ── Contact Inquiry Submission Logic ────────
+function initInquiryFormProcessing() {
+  const form = document.getElementById('contactForm');
+  if (!form) return;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Bind field targets to the database parameters expected by inquiry_handler.php
+    const destEl = document.getElementById('inquiryDestination');
+    const subjEl = document.getElementById('inquirySubject');
+    const msgEl = document.getElementById('inquiryMessage');
+    const successMsg = document.getElementById('formSuccess');
+
+    let isFormValid = true;
+    [destEl, subjEl, msgEl].forEach(element => {
+      if (!element) return;
+      const errLabel = element.parentElement.querySelector('.form-error');
+      if (!element.value.trim()) {
+        if (errLabel) errLabel.style.display = 'block';
+        element.style.borderColor = 'var(--coral)';
+        isFormValid = false;
+      } else {
+        if (errLabel) errLabel.style.display = 'none';
+        element.style.borderColor = '';
+      }
+    });
+
+    if (!isFormValid) {
+      showToast('Please correct the highlighted form errors.', 'error');
+      return;
+    }
+
+    const fd = new FormData();
+    fd.append('destination', destEl.value);
+    fd.append('subject', subjEl.value.trim());
+    fd.append('message', msgEl.value.trim());
+
+    try {
+      const response = await fetch('inquiry_handler.php', { method: 'POST', body: fd });
+      
+      if (response.status === 401) {
+        showToast('Your session has expired. Please log in again.', 'error');
+        return;
+      }
+
+      const data = await response.json();
+
+      if (data.status === 'success') {
+        if (successMsg) {
+          successMsg.textContent = data.message || 'Inquiry successfully transmitted.';
+          successMsg.style.display = 'block';
+        }
+        form.reset();
+        showToast('Inquiry filed safely!', 'success');
+        setTimeout(() => { if (successMsg) successMsg.style.display = 'none'; }, 5000);
+      } else {
+        showToast(data.message || 'Submission was rejected by server.', 'error');
+      }
+    } catch (err) {
+      showToast('Network transaction drop occurred.', 'error');
+    }
+  });
+}
+
+// ── Original Visual Components (Preserved) ──
 function initSlider() {
   const slider = document.getElementById('destSlider');
   const dotsContainer = document.getElementById('sliderDots');
   if (!slider || !dotsContainer) return;
 
   const cards = slider.querySelectorAll('.dest-card');
-  const count = Math.ceil(cards.length / 2); // approximate pages
-  let activeDot = 0;
-
   dotsContainer.innerHTML = '';
-  for (let i = 0; i < cards.length; i++) {
+  cards.forEach((_, i) => {
     const d = document.createElement('div');
     d.className = 'dot' + (i === 0 ? ' active' : '');
     d.addEventListener('click', () => {
       cards[i].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
     });
     dotsContainer.appendChild(d);
-  }
+  });
 
   slider.addEventListener('scroll', () => {
     const dots = dotsContainer.querySelectorAll('.dot');
@@ -81,7 +297,6 @@ function initSlider() {
   });
 }
 
-// ── Scroll Reveal ────────────────────────────
 function initReveal() {
   const els = document.querySelectorAll('.reveal');
   if (!els.length) return;
@@ -91,17 +306,6 @@ function initReveal() {
   els.forEach(el => obs.observe(el));
 }
 
-// ── Toast ────────────────────────────────────
-function showToast(msg, type = 'success') {
-  let t = document.querySelector('.toast');
-  if (!t) { t = document.createElement('div'); t.className = 'toast'; document.body.appendChild(t); }
-  t.textContent = msg;
-  t.className = `toast ${type}`;
-  requestAnimationFrame(() => { t.classList.add('show'); });
-  setTimeout(() => { t.classList.remove('show'); }, 3400);
-}
-
-// ── Filter Bar (Destinations page) ───────────
 function initFilter() {
   const btns = document.querySelectorAll('.filter-btn');
   const cards = document.querySelectorAll('.dest-full-card');
@@ -112,182 +316,36 @@ function initFilter() {
       btns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const filter = btn.dataset.filter;
-
       cards.forEach(card => {
         const tag = card.dataset.tag || '';
-        const show = filter === 'all' || tag === filter;
-        card.style.display = show ? '' : 'none';
+        card.style.display = (filter === 'all' || tag === filter) ? '' : 'none';
       });
     });
   });
 }
 
-// ── Contact Form ─────────────────────────────
-function initContactForm() {
-  const form = document.getElementById('contactForm');
-  if (!form) return;
-
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    let valid = true;
-
-    // Basic validation
-    const fields = form.querySelectorAll('[required]');
-    fields.forEach(f => {
-      const err = f.parentElement.querySelector('.form-error');
-      if (!f.value.trim()) {
-        if (err) err.style.display = 'block';
-        f.style.borderColor = 'var(--coral)';
-        valid = false;
-      } else {
-        if (err) err.style.display = 'none';
-        f.style.borderColor = '';
-      }
-    });
-
-    // Email format
-    const emailField = form.querySelector('[type="email"]');
-    if (emailField && emailField.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailField.value)) {
-      const err = emailField.parentElement.querySelector('.form-error');
-      if (err) { err.textContent = 'Please enter a valid email.'; err.style.display = 'block'; }
-      emailField.style.borderColor = 'var(--coral)';
-      valid = false;
-    }
-
-    if (!valid) { showToast('Please fill in all required fields.', 'error'); return; }
-
-    // Simulate submission
-    const successMsg = document.getElementById('formSuccess');
-    if (successMsg) successMsg.style.display = 'block';
-    form.reset();
-    showToast('Message sent! We\'ll get back to you soon. 🌴', 'success');
-    setTimeout(() => { if (successMsg) successMsg.style.display = 'none'; }, 5000);
-  });
+function showToast(msg, type = 'success') {
+  let t = document.querySelector('.toast');
+  if (!t) { t = document.createElement('div'); t.className = 'toast'; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.className = `toast ${type}`;
+  requestAnimationFrame(() => { t.classList.add('show'); });
+  setTimeout(() => { t.classList.remove('show'); }, 3400);
 }
 
-// ── Auth Forms (Login/Signup page) ───────────
-function initAuth() {
-  const tabs    = document.querySelectorAll('.auth-tab');
-  const panels  = document.querySelectorAll('.auth-form-panel');
-  if (!tabs.length) return;
-
-  // Switch tabs
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      panels.forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      const target = document.getElementById(tab.dataset.target);
-      if (target) target.classList.add('active');
-    });
-  });
-
-  // Check if URL hash is #signup
-  if (location.hash === '#signup') {
-    const signupTab = document.querySelector('[data-target="signupPanel"]');
-    if (signupTab) signupTab.click();
-  }
-
-  // ── LOGIN ──
-  const loginForm = document.getElementById('loginForm');
-  if (loginForm) {
-    loginForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const email = loginForm.querySelector('#loginEmail').value.trim();
-      const pass  = loginForm.querySelector('#loginPass').value;
-      const alert = document.getElementById('loginAlert');
-
-      // Check against stored users
-      const users = JSON.parse(localStorage.getItem('palawan_users') || '[]');
-      const user = users.find(u => u.email === email && u.password === pass);
-
-      if (!user) {
-        alert.textContent = 'Invalid email or password.';
-        alert.className = 'auth-alert error';
-        alert.style.display = 'block';
-        return;
-      }
-      alert.className = 'auth-alert success';
-      alert.textContent = `Welcome back, ${user.name}! Redirecting...`;
-      alert.style.display = 'block';
-      saveUser(user);
-      setTimeout(() => { location.href = 'index.html'; }, 1200);
-    });
-  }
-
-  // ── SIGNUP ──
-  const signupForm = document.getElementById('signupForm');
-  if (signupForm) {
-    signupForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name    = signupForm.querySelector('#signupName').value.trim();
-      const email   = signupForm.querySelector('#signupEmail').value.trim();
-      const pass    = signupForm.querySelector('#signupPass').value;
-      const confirm = signupForm.querySelector('#signupConfirm').value;
-      const alert   = document.getElementById('signupAlert');
-
-      // Validation
-      if (!name || !email || !pass || !confirm) {
-        alert.textContent = 'Please fill in all fields.';
-        alert.className = 'auth-alert error';
-        alert.style.display = 'block';
-        return;
-      }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        alert.textContent = 'Please enter a valid email address.';
-        alert.className = 'auth-alert error';
-        alert.style.display = 'block';
-        return;
-      }
-      if (pass.length < 6) {
-        alert.textContent = 'Password must be at least 6 characters.';
-        alert.className = 'auth-alert error';
-        alert.style.display = 'block';
-        return;
-      }
-      if (pass !== confirm) {
-        alert.textContent = 'Passwords do not match.';
-        alert.className = 'auth-alert error';
-        alert.style.display = 'block';
-        return;
-      }
-
-      // Check duplicate email
-      const users = JSON.parse(localStorage.getItem('palawan_users') || '[]');
-      if (users.find(u => u.email === email)) {
-        alert.textContent = 'An account with that email already exists.';
-        alert.className = 'auth-alert error';
-        alert.style.display = 'block';
-        return;
-      }
-
-      const newUser = { name, email, password: pass, joined: new Date().toISOString() };
-      users.push(newUser);
-      localStorage.setItem('palawan_users', JSON.stringify(users));
-      saveUser(newUser);
-
-      alert.textContent = `Account created! Welcome, ${name}! 🌴`;
-      alert.className = 'auth-alert success';
-      alert.style.display = 'block';
-      setTimeout(() => { location.href = 'index.html'; }, 1300);
-    });
-  }
-}
-
-// ── INIT ─────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  updateNavAuth();
+// ── Application Bootloader Lifecycle ────────
+document.addEventListener('DOMContentLoaded', async () => {
+  // Sync context with PHP backend immediately on page load
+  await syncAuthState();
+  
   initNavbar();
   initSlider();
-  initReveal();
   initFilter();
-  initContactForm();
-  initAuth();
+  initAuthFormProcessing();
+  initInquiryFormProcessing();
 
-  // Add reveal class to key sections dynamically
   document.querySelectorAll('.intro-text, .intro-map, .dest-full-card, .exp-card, .contact-info, .contact-form').forEach(el => {
     el.classList.add('reveal');
   });
-  // Re-run observer after adding classes
   initReveal();
 });
